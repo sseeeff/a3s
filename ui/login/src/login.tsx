@@ -14,11 +14,13 @@ import {
 import { useIssue } from "./useIssue"
 import { CloakDialog } from "./cloak-dialog"
 import jwtDecode from "jwt-decode"
-
-type StringBoolean = "true" | "false"
+import { StringBoolean } from "./types"
 
 export const Login = () => {
   const [cloak, setCloak] = useState("__ENABLE_CLOAKING__" as StringBoolean)
+  const [enableQrCode, setEnableQrCode] = useState(
+    "__ENABLE_QR_CODE__" as StringBoolean
+  )
   const [sourceType, setSourceType] = useState("MTLS")
   const [sourceNamespace, setSourceNamespace] = useState("/")
   const [sourceName, setSourceName] = useState("")
@@ -33,9 +35,9 @@ export const Login = () => {
       // apiUrl: "__API_URL__",
       apiUrl: "https://localhost:44443",
       redirectUrl: "__REDIRECT_URL__",
-      // audience: ["__AUDIENCE__"],
+      // audience: [enableQrCode ? "public" : "__AUDIENCE__"],
       audience: ["https://127.0.0.1:44443"],
-      saveToken: cloak === "true",
+      saveToken: cloak === "true" || enableQrCode === "true",
       OIDCstate,
       OIDCcode,
     })
@@ -143,6 +145,17 @@ export const Login = () => {
               />
             }
             label="Cloak claims"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={enableQrCode === "true"}
+                onChange={e => {
+                  setEnableQrCode(e.target.checked ? "true" : "false")
+                }}
+              />
+            }
+            label="Show QR Code"
           />
           <Button
             onClick={() => {
